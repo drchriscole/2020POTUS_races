@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(jsonlite)
 library(lubridate)
 library(ggplot2)
@@ -27,7 +27,16 @@ raceToDf = function(race) {
 
 ```
 
-## R Markdown
+## Key US Presidential Races
+
+Three days after voting ended we still have several key races still to be decided which will result in who is the next POTUS. They are:
+
+  * Nevada
+  * Arizona
+  * Georgia
+  * Pennsylvania
+
+Nevada and Arizona are states where Biden had an early lead which is being eroded by Trump votes. Whereas the opposite is true in Georgia and Pennsylvania; Trump had early leads which Biden is quickly catching up as the postal votes are counted.
 
 
 ```{r nevada}
@@ -55,7 +64,31 @@ ggplot(df, aes(x = Count_pc, y = Diff)) +
 
 
 ```
-```{r georgia, fig.width=9}
+
+```{r arizona}
+
+az.json = fromJSON('https://static01.nyt.com/elections-assets/2020/data/api/2020-11-03/race-page/arizona/president.json')
+
+df = raceToDf(az.json$data$races)
+# get last time
+d = ymd_hms(tail(df,1)$Time)
+
+ggplot(df, aes(x = Count_pc, y = Diff)) + 
+  labs(title = 'Arizona',
+       caption = paste('Last update:', format(d, "%H:%M %d %b")),
+       x = 'Percentage of expected vote',
+       y = 'Biden lead') +
+  geom_rect(aes(xmin = 0.65, ymin = 0, xmax = 1, ymax = 0.05), fill = 'blue', alpha = 0.8) +
+  geom_rect(aes(xmin = 0.65, ymin = -0.01, xmax = 1, ymax = 0), fill = 'red', alpha = 0.8) +
+  geom_smooth(method = 'lm') +
+  geom_point() + 
+  geom_hline(yintercept = 0) +
+  scale_y_continuous(limits = c(-0.01, 0.05), labels = scales::percent_format(accuracy = 1)) +
+  scale_x_continuous(limits=c(0.65,1), labels = scales::percent_format(accuracy = 0.1)) +
+  theme_minimal()
+```
+
+```{r georgia}
 
 ga.json = fromJSON('https://static01.nyt.com/elections-assets/2020/data/api/2020-11-03/race-page/georgia/president.json')
 
@@ -106,25 +139,3 @@ ggplot(df, aes(x = Count_pc, y = Diff)) +
 
 
 
-```{r arizona}
-
-az.json = fromJSON('https://static01.nyt.com/elections-assets/2020/data/api/2020-11-03/race-page/arizona/president.json')
-
-df = raceToDf(az.json$data$races)
-# get last time
-d = ymd_hms(tail(df,1)$Time)
-
-ggplot(df, aes(x = Count_pc, y = Diff)) + 
-  labs(title = 'Arizona',
-       caption = paste('Last update:', format(d, "%H:%M %d %b")),
-       x = 'Percentage of expected vote',
-       y = 'Biden lead') +
-  geom_rect(aes(xmin = 0.65, ymin = 0, xmax = 1, ymax = 0.05), fill = 'blue', alpha = 0.8) +
-  geom_rect(aes(xmin = 0.65, ymin = -0.01, xmax = 1, ymax = 0), fill = 'red', alpha = 0.8) +
-  geom_smooth(method = 'lm') +
-  geom_point() + 
-  geom_hline(yintercept = 0) +
-  scale_y_continuous(limits = c(-0.01, 0.05), labels = scales::percent_format(accuracy = 1)) +
-  scale_x_continuous(limits=c(0.65,1), labels = scales::percent_format(accuracy = 0.1)) +
-  theme_minimal()
-```
