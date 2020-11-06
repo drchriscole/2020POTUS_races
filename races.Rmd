@@ -1,7 +1,5 @@
 ---
-title: "Untitled"
-author: "Christian Cole"
-date: "06/11/2020"
+title: 'Key US Presidential Races'
 output: html_document
 ---
 
@@ -28,7 +26,6 @@ raceToDf = function(race) {
 
 ```
 
-## Key US Presidential Races
 
 Three days after voting ended we still have several key races still to be decided which will result in who is the next POTUS. They are:
 
