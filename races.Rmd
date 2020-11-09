@@ -24,6 +24,15 @@ raceToDf = function(race) {
 
 }
 
+# generate a linear model to predict the outcome at
+# 100% of the vote using the last 15 datapoints
+predictOutcome = function(df, using = 15) {
+  df.sub = tail(df, using)
+  pred = predict(lm(Diff ~ Count_pc, df.sub), data.frame(Count_pc = seq(0.85, 1, 0.01)))
+  pred.df = data.frame(Count_pc = seq(0.85, 1, 0.01), Diff = pred)
+  return(pred.df)
+}
+
 ```
 
 
@@ -45,9 +54,7 @@ df = raceToDf(nv.json$data$races)
 # get last time
 d = ymd_hms(tail(df,1)$Time)
 
-df.sub = df %>% filter(Count_pc > 0.80)
-pred = predict(lm(Diff ~ Count_pc, df.sub), data.frame(Count_pc = seq(0.9, 1, 0.01)))
-pred.df = data.frame(Count_pc = seq(0.9, 1, 0.01), Diff = pred)
+pred.df = predictOutcome(df)
 
 ggplot(df, aes(x = Count_pc, y = Diff)) + 
   labs(title = 'Nevada',
@@ -56,10 +63,10 @@ ggplot(df, aes(x = Count_pc, y = Diff)) +
        y = 'Biden lead') +
   geom_rect(aes(xmin = 0.65, ymin = 0, xmax = 1, ymax = 0.05), fill = 'blue', alpha = 0.8) +
   geom_rect(aes(xmin = 0.65, ymin = -0.01, xmax = 1, ymax = 0), fill = 'red', alpha = 0.8) +
-  geom_smooth(method = 'lm', fullrange = TRUE, colour = 'orange') +
+  #geom_smooth(method = 'lm', fullrange = TRUE, colour = 'orange') +
+  geom_line(data = pred.df, aes(x = Count_pc, y = Diff), colour = "orange", size = 0.9) +
   geom_point() + 
   geom_hline(yintercept = 0) +
-  #geom_line(data = pred.df, aes(x = Count_pc, y = Diff), colour = "orange", size = 0.9) +
   geom_text(data=tail(df, 1), aes(x = Count_pc, y = Diff), label = paste0(round(100*tail(df, 1)$Diff,1),'%'), nudge_x = 0.01, colour = 'white', size = 2.7, fontface = 'bold') +
   scale_y_continuous(limits = c(-0.01, 0.05), labels = scales::percent_format(accuracy = 1)) +
   scale_x_continuous(limits=c(0.65,1), labels = scales::percent_format(accuracy = 0.1)) +
@@ -77,9 +84,7 @@ df = raceToDf(az.json$data$races)
 # get last time
 d = ymd_hms(tail(df,1)$Time)
 
-df.sub = df %>% filter(Count_pc > 0.80)
-pred = predict(lm(Diff ~ Count_pc, df.sub), data.frame(Count_pc = seq(0.9, 1, 0.01)))
-pred.df = data.frame(Count_pc = seq(0.9, 1, 0.01), Diff = pred)
+pred.df = predictOutcome(df)
 
 ggplot(df, aes(x = Count_pc, y = Diff)) + 
   labs(title = 'Arizona',
@@ -88,10 +93,10 @@ ggplot(df, aes(x = Count_pc, y = Diff)) +
        y = 'Biden lead') +
   geom_rect(aes(xmin = 0.65, ymin = 0, xmax = 1, ymax = 0.05), fill = 'blue', alpha = 0.8) +
   geom_rect(aes(xmin = 0.65, ymin = -0.01, xmax = 1, ymax = 0), fill = 'red', alpha = 0.8) +
-  geom_smooth(method = 'lm', fullrange = TRUE, colour = 'orange') +
+  #geom_smooth(method = 'lm', fullrange = TRUE, colour = 'orange') +
+  geom_line(data = pred.df, aes(x = Count_pc, y = Diff), colour = "orange", size = 0.9) +
   geom_point() + 
   geom_hline(yintercept = 0) +
-  #geom_line(data = pred.df, aes(x = Count_pc, y = Diff), colour = "orange", size = 0.9) +
   geom_text(data=tail(df, 1), aes(x = Count_pc, y = Diff), label = paste0(round(100*tail(df, 1)$Diff,1),'%'), nudge_x = 0.01, colour = 'white', size = 2.7, fontface = 'bold') +
   scale_y_continuous(limits = c(-0.01, 0.05), labels = scales::percent_format(accuracy = 1)) +
   scale_x_continuous(limits=c(0.65,1), labels = scales::percent_format(accuracy = 0.1)) +
@@ -106,9 +111,7 @@ df = raceToDf(ga.json$data$races)
 # get last time
 d = ymd_hms(tail(df,1)$Time)
 
-df.sub = df %>% filter(Count_pc > 0.80)
-pred = predict(lm(Diff ~ Count_pc, df.sub), data.frame(Count_pc = seq(0.9, 1, 0.01)))
-pred.df = data.frame(Count_pc = seq(0.9, 1, 0.01), Diff = pred)
+pred.df = predictOutcome(df)
 
 ggplot(df, aes(x = Count_pc, y = Diff)) + 
   labs(title = 'Georgia',
@@ -117,11 +120,11 @@ ggplot(df, aes(x = Count_pc, y = Diff)) +
        y = 'Biden lead') +
   geom_rect(aes(xmin = 0.65, ymin = 0, xmax = 1, ymax = 0.01), fill = 'blue', alpha = 0.8) +
   geom_rect(aes(xmin = 0.65, ymin = -0.05, xmax = 1, ymax = 0), fill = 'red', alpha = 0.8) +
-  geom_smooth(method = 'lm', fullrange = TRUE, colour = 'orange') +
+  #geom_smooth(method = 'lm', fullrange = TRUE, colour = 'orange') +
+  geom_line(data = pred.df, aes(x = Count_pc, y = Diff), colour = "orange", size = 0.9) +
   geom_point() + 
   geom_hline(yintercept = 0) +
-  #geom_line(data = pred.df, aes(x = Count_pc, y = Diff), colour = "orange", size = 0.9) +
-  geom_text(data=tail(df, 1), aes(x = Count_pc, y = Diff), label = paste0(round(100*tail(df, 1)$Diff,1),'%'), nudge_x = 0.01, colour = 'white', size = 2.7, fontface = 'bold') +
+  geom_text(data=tail(df, 1), aes(x = Count_pc, y = Diff), label = paste0(round(100*tail(df, 1)$Diff,1),'%'), nudge_x = -0.01, colour = 'white', size = 2.7, fontface = 'bold') +
   scale_y_continuous(limits = c(-0.05, 0.01), labels = scales::percent_format(accuracy = 1)) +
   scale_x_continuous(limits=c(0.65,1), labels = scales::percent_format(accuracy = 0.1)) +
   theme_minimal()
@@ -138,23 +141,21 @@ df = raceToDf(pa.json$data$races)
 # get last time
 d = ymd_hms(tail(df,1)$Time)
 
-df.sub = df %>% filter(Count_pc > 0.80)
-pred = predict(lm(Diff ~ Count_pc, df.sub), data.frame(Count_pc = seq(0.9, 1, 0.01)))
-pred.df = data.frame(Count_pc = seq(0.9, 1, 0.01), Diff = pred)
+pred.df = predictOutcome(df)
 
 ggplot(df, aes(x = Count_pc, y = Diff)) + 
   labs(title = 'Pennsylvania',
        caption = paste('Last update:', format(d, "%H:%M %d %b")),
        x = 'Percentage of expected vote',
        y = 'Biden lead') +
-  geom_rect(aes(xmin = 0.65, ymin = 0, xmax = 1, ymax = 0.01), fill = 'blue', alpha = 0.8) +
+  geom_rect(aes(xmin = 0.65, ymin = 0, xmax = 1, ymax = 0.03), fill = 'blue', alpha = 0.8) +
   geom_rect(aes(xmin = 0.65, ymin = -0.05, xmax = 1, ymax = 0), fill = 'red', alpha = 0.8) +
-  geom_smooth(method = 'lm', fullrange = TRUE, colour = 'orange') +
+  #geom_smooth(method = 'lm', fullrange = TRUE, colour = 'orange') +
+  geom_line(data = pred.df, aes(x = Count_pc, y = Diff), colour = "orange", size = 0.9) +
   geom_point() + 
   geom_hline(yintercept = 0) +
-  #geom_line(data = pred.df, aes(x = Count_pc, y = Diff), colour = "orange", size = 0.9) +
   geom_text(data=tail(df, 1), aes(x = Count_pc, y = Diff), label = paste0(round(100*tail(df, 1)$Diff,1),'%'), nudge_x = 0.01, colour = 'white', size = 2.7, fontface = 'bold') +
-  scale_y_continuous(limits = c(-0.05, 0.01), labels = scales::percent_format(accuracy = 1)) +
+  scale_y_continuous(limits = c(-0.05, 0.03), labels = scales::percent_format(accuracy = 1)) +
   scale_x_continuous(limits=c(0.65,1), labels = scales::percent_format(accuracy = 0.1)) +
   theme_minimal()
 ```
